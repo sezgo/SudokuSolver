@@ -19,7 +19,7 @@ try
     SudokuBoardDisplayer sudokuBoardDisplayer = new SudokuBoardDisplayer();
 
     Console.WriteLine("Please enter the filename containing the Sudoku Puzzle");
-    var filename = Console.ReadLine();
+    var filename = Console.ReadLine() ?? string.Empty;
 
     var sudokuBoard = sudokuFileReader.ReadFile(filename);
     sudokuBoardDisplayer.Display("Initial State", sudokuBoard);

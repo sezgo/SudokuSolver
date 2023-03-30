@@ -62,6 +62,8 @@ namespace SudokuSolver.Strategies
 
             for (int row = 0; row < sudokuBoard.GetLength(0); row++)
             {
+                // Only this could be enough?? sudokuBoard[row, givenCol].ToString().Length > 2
+                // Meaning check all cells that has more possibilities than 2
                 if (sudokuBoard[row, givenCol] != sudokuBoard[givenRow, givenCol] && sudokuBoard[row, givenCol].ToString().Length > 1)
                 {
                     ELiminateNakedPair(sudokuBoard, sudokuBoard[givenRow, givenCol], row, givenCol);
@@ -88,9 +90,9 @@ namespace SudokuSolver.Strategies
 
             var sudokuMap = _sudokuMapper.Find(givenRow, givenCol);
 
-            for (int row = sudokuMap.startRow; row < sudokuMap.startRow + 3; row++)
+            for (int row = sudokuMap.StartRow; row < sudokuMap.StartRow + 3; row++)
             {
-                for (int col = sudokuMap.startCol; col < sudokuMap.startCol+ 3; col++)
+                for (int col = sudokuMap.StartCol; col < sudokuMap.StartCol+ 3; col++)
                 {
                     if (sudokuBoard[row, col].ToString().Length > 1 && sudokuBoard[row, col] != sudokuBoard[givenRow, givenCol])
                     {
@@ -109,10 +111,10 @@ namespace SudokuSolver.Strategies
                 {
                     var elementSame = givenRow == row && givenCol == col;
                     var elementInSameBlock =
-                        _sudokuMapper.Find(givenRow, givenCol).startRow ==
-                        _sudokuMapper.Find(row, col).startRow &&
-                        _sudokuMapper.Find(givenRow, givenCol).startCol ==
-                        _sudokuMapper.Find(row, col).startCol;
+                        _sudokuMapper.Find(givenRow, givenCol).StartRow ==
+                        _sudokuMapper.Find(row, col).StartRow &&
+                        _sudokuMapper.Find(givenRow, givenCol).StartCol ==
+                        _sudokuMapper.Find(row, col).StartCol;
 
                     if (!elementSame && elementInSameBlock && IsNakedPair(sudokuBoard[givenRow, givenCol], sudokuBoard[row, col])) return true;
                 }
@@ -129,9 +131,9 @@ namespace SudokuSolver.Strategies
             }
         }
 
-        private bool IsNakedPair(int firstPair, int secondPair)
+        private bool IsNakedPair(int firstNaked, int seconNaked)
         {
-            return firstPair.ToString().Length == 2 && firstPair == secondPair;
+            return firstNaked.ToString().Length == 2 && firstNaked == seconNaked;
         }
     }
 }

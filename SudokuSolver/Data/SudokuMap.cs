@@ -8,7 +8,7 @@ namespace SudokuSolver.Data
 {
     internal class SudokuMap
     {
-        public int startRow { get; set; }
-        public int startCol { get; set; }
+        public int StartRow { get; set; }
+        public int StartCol { get; set; }
     }
 }

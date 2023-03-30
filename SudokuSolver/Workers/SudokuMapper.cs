@@ -15,48 +15,48 @@ namespace SudokuSolver.Workers
 
             if ((givenRow >= 0 && givenRow <= 2) && (givenCol >= 0 && givenCol <=2))
             {
-                sudokuMap.startRow = 0;
-                sudokuMap.startCol = 0;
+                sudokuMap.StartRow = 0;
+                sudokuMap.StartCol = 0;
             }
             else if ((givenRow >= 0 && givenRow <= 2) && (givenCol >= 3 && givenCol <= 5))
             {
-                sudokuMap.startRow = 0;
-                sudokuMap.startCol = 3;
+                sudokuMap.StartRow = 0;
+                sudokuMap.StartCol = 3;
             }
             else if ((givenRow >= 0 && givenRow <= 2) && (givenCol >= 6 && givenCol <= 8))
             {
-                sudokuMap.startRow = 0;
-                sudokuMap.startCol = 6;
+                sudokuMap.StartRow = 0;
+                sudokuMap.StartCol = 6;
             }
             else if ((givenRow >= 3 && givenRow <= 5) && (givenCol >= 0 && givenCol <= 2))
             {
-                sudokuMap.startRow = 3;
-                sudokuMap.startCol = 0;
+                sudokuMap.StartRow = 3;
+                sudokuMap.StartCol = 0;
             }
             else if ((givenRow >= 3 && givenRow <= 5) && (givenCol >= 3 && givenCol <= 5))
             {
-                sudokuMap.startRow = 3;
-                sudokuMap.startCol = 3;
+                sudokuMap.StartRow = 3;
+                sudokuMap.StartCol = 3;
             }
             else if ((givenRow >= 3 && givenRow <= 5) && (givenCol >= 6 && givenCol <= 8))
             {
-                sudokuMap.startRow = 3;
-                sudokuMap.startCol = 6;
+                sudokuMap.StartRow = 3;
+                sudokuMap.StartCol = 6;
             }
             else if ((givenRow >= 6 && givenRow <= 8) && (givenCol >= 0 && givenCol <= 2))
             {
-                sudokuMap.startRow = 6;
-                sudokuMap.startCol = 0;
+                sudokuMap.StartRow = 6;
+                sudokuMap.StartCol = 0;
             }
             else if ((givenRow >= 6 && givenRow <= 8) && (givenCol >= 3 && givenCol <= 5))
             {
-                sudokuMap.startRow = 6;
-                sudokuMap.startCol = 3;
+                sudokuMap.StartRow = 6;
+                sudokuMap.StartCol = 3;
             }
             else if ((givenRow >= 6 && givenRow <= 8) && (givenCol >= 6 && givenCol <= 8))
             {
-                sudokuMap.startRow = 6;
-                sudokuMap.startCol = 6;
+                sudokuMap.StartRow = 6;
+                sudokuMap.StartCol = 6;
             }
 
             return sudokuMap;
