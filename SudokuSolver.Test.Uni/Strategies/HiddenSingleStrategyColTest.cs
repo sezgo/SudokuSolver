@@ -3,7 +3,7 @@
 namespace SudokuSolver.Test.Unit.Strategies.Tests
 {
     [TestClass]
-    public class HiddenSingleStrategyColTest
+    public class HiddenSingleStrategyBlockTest
     {
         private readonly HiddenSingleStrategy _hiddenSingleStrategy = new(new SudokuMapper());
         private readonly SudokuBoardStateManager _sudokuBoardStateManager = new();
@@ -41,10 +41,10 @@ namespace SudokuSolver.Test.Unit.Strategies.Tests
         }
 
         [TestMethod]
-        public void CleanHiddenSingleInRow_NoHiddenSingles_DoesntChangeBoardState()
+        public void CleanHiddenSingleInCol_HiddenSingleDoesntExist_DoesntChangeBoardState()
         {
             var currentState = _sudokuBoardStateManager.GenerateState(sudokuBoard);
-            _hiddenSingleStrategy.CleanHiddenSingleInRow(sudokuBoard, 5);
+            _hiddenSingleStrategy.CleanHiddenSingleInCol(sudokuBoard, 5);
             var nextState = _sudokuBoardStateManager.GenerateState(sudokuBoard);
             Assert.AreEqual(nextState, currentState);
         }
@@ -87,7 +87,7 @@ namespace SudokuSolver.Test.Unit.Strategies.Tests
 
         }
         [TestMethod]
-        public void IsHiddenSingle_NonHiddenSingle_ReturnsFalse()
+        public void IsHiddenSingleInCol_NonHiddenSingle_ReturnsFalse()
         {
             var result = _hiddenSingleStrategy.IsHiddenSingleInCol(sudokuBoard, 0, 2, '2');
             Assert.IsFalse(result);
@@ -96,7 +96,7 @@ namespace SudokuSolver.Test.Unit.Strategies.Tests
             Assert.IsFalse(result);
         }
         [TestMethod]
-        public void IsHiddenSingle_SolvedCell_ReturnsFalse()
+        public void IsHiddenSingleInCol_SolvedCell_ReturnsFalse()
         {
 
             var result = _hiddenSingleStrategy.IsHiddenSingleInCol(sudokuBoard, 3, 2, '9');
