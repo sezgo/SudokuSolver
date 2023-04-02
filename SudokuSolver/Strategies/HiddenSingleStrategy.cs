@@ -106,8 +106,8 @@ namespace SudokuSolver.Test.Unit.Strategies
         /// <returns>True if candidate is the only encounter in the row, false otherwise.</returns>
         internal bool IsHiddenSingleForRow(int[,] sudokuBoard, int givenRow, int givenCol, char candidate)
         {
-            // Already a solved cell
-            if (sudokuBoard[givenRow, givenCol].ToString().Equals(candidate.ToString())) return false;
+            // Empty Cell
+            if (sudokuBoard[givenRow, givenCol].ToString().Length == 1) return false;
 
             for (int col = 0; col < sudokuBoard.GetLength(1); col++)
             {
