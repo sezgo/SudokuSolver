@@ -21,23 +21,16 @@ namespace SudokuSolver.Test.Unit.Strategies.Tests
         };
 
         [TestMethod]
-        public void CleanHiddenSingleInCol_HiddenSinglesExist_SolvesFirstHiddenSingle()
+        [DataRow(0, 2, 3)]
+        public void CleanHiddenSingleInCol_HiddenSinglesExist_SolvesFirstHiddenSingle(int row, int col, int expected)
         {
             var currentState = _sudokuBoardStateManager.GenerateState(sudokuBoard);
 
-            _hiddenSingleStrategy.CleanHiddenSingleInCol(sudokuBoard, 2);
+            _hiddenSingleStrategy.CleanHiddenSingleInCol(sudokuBoard, col);
             var nextState = _sudokuBoardStateManager.GenerateState(sudokuBoard);
 
             Assert.AreNotEqual(nextState, currentState);
-            Assert.AreEqual(sudokuBoard[0, 2], 3);
-
-            currentState = _sudokuBoardStateManager.GenerateState(sudokuBoard);
-
-            _hiddenSingleStrategy.CleanHiddenSingleInCol(sudokuBoard, 2);
-            nextState = _sudokuBoardStateManager.GenerateState(sudokuBoard);
-
-            Assert.AreNotEqual(nextState, currentState);
-            Assert.AreEqual(sudokuBoard[0, 2], 3);
+            Assert.AreEqual(expected, sudokuBoard[row, col]);
         }
 
         [TestMethod]

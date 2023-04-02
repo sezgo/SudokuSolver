@@ -97,7 +97,7 @@ namespace SudokuSolver.Strategies
                     }
                 }
             }
-            return (0,0,0,false);
+            return (-1, -1,-1,false);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace SudokuSolver.Strategies
                     }
                 }
             }
-            return (0, 0, 0, false);
+            return (-1, -1, -1, false);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace SudokuSolver.Strategies
                     }
                 }
             }
-            return (0, 0, 0,false);
+            return (-1, -1, -1, false);
         }
 
         /// <summary>
