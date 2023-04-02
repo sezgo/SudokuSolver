@@ -30,54 +30,11 @@ namespace SudokuSolver.Test.Unit.Strategies.Tests
             };
 
         [TestMethod]
-        [DataRow(0, 0, 0, 1)]
-        public void CleanHiddenSingleInRow_HiddenSinglesExist_SolvesFirstHiddenSingle(int row, int checkRow, int checkCol, int expected)
-        {
-            var currentState = _sudokuBoardStateManager.GenerateState(sudokuBoard);
-            _hiddenSingleStrategy.CleanHiddenSingleInRow(sudokuBoard, row);
-            var nextState = _sudokuBoardStateManager.GenerateState(sudokuBoard);
-            Assert.AreNotEqual(currentState, nextState);
-            Assert.AreEqual(expected, sudokuBoard[checkRow, checkCol]);
-        }
-
-        [TestMethod]
-        public void CleanHiddenSingleInRow_NoHiddenSingles_DoesntChangeBoardState()
-        {
-            var currentState = _sudokuBoardStateManager.GenerateState(sudokuBoard);
-            _hiddenSingleStrategy.CleanHiddenSingleInRow(sudokuBoard, 5);
-            var nextState = _sudokuBoardStateManager.GenerateState(sudokuBoard);
-            Assert.AreEqual(currentState, nextState);
-        }
-
-        [TestMethod()]
-        public void HasHiddenSingleInRow_HiddenSingleExists_ReturnsFirstHiddenSingle()
-        {
-            var hiddenSingle = _hiddenSingleStrategy.HasHiddenSingleInRow(sudokuBoard, 0);
-            Assert.IsTrue(hiddenSingle.Single != -1);
-            Assert.IsTrue(hiddenSingle.Single == 1);
-        }
-
-
-        // NonHiddenSingle: (-1, -1, -1)
-        [TestMethod()]
-        public void HasHiddenSingleInRow_HiddenSingleDoesntExists_ReturnsNonHiddenSingle()
-        {
-            var hiddenSingle = _hiddenSingleStrategy.HasHiddenSingleInRow(sudokuBoard, 5);
-            Assert.IsTrue(hiddenSingle.Single == -1);
-        }
-        [TestMethod()]
-        public void HasHiddenSingleInRow_EmptyRow_ReturnsNonHiddenSingle()
-        {
-            var hiddenSingle = _hiddenSingleStrategy.HasHiddenSingleInRow(sudokuBoard, 1);
-            Assert.IsTrue(hiddenSingle.Single == -1);
-        }
-
-        [TestMethod]
         [DataRow(0, 0, '1')]
         [DataRow(0, 1, '5')]
         public void IsHiddenSingleInRow_HiddenSingle_ReturnsTrue(int row, int col, char candidate)
         {
-            var result = _hiddenSingleStrategy.IsHiddenSingleInRow(sudokuBoard, row, col, candidate);
+            var result = _hiddenSingleStrategy.IsHiddenSingleForRow(sudokuBoard, row, col, candidate);
             Assert.IsTrue(result);
 
         }
@@ -86,14 +43,14 @@ namespace SudokuSolver.Test.Unit.Strategies.Tests
         [DataRow(0, 8, '6')]
         public void IsHiddenSingleInRow_NonHiddenSingle_ReturnsFalse(int row, int col, char candidate)
         {
-            var result = _hiddenSingleStrategy.IsHiddenSingleInRow(sudokuBoard, row, col, candidate);
+            var result = _hiddenSingleStrategy.IsHiddenSingleForRow(sudokuBoard, row, col, candidate);
             Assert.IsFalse(result);
         }
         [TestMethod]
         [DataRow(5, 0, '2')]
         public void IsHiddenSingleInRow_SolvedCell_ReturnsFalse(int row, int col, char candidate)
         {
-            var result = _hiddenSingleStrategy.IsHiddenSingleInRow(sudokuBoard, row, col, candidate);
+            var result = _hiddenSingleStrategy.IsHiddenSingleForRow(sudokuBoard, row, col, candidate);
             Assert.IsFalse(result);
         }
     }
