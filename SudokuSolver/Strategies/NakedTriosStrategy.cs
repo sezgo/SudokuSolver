@@ -52,7 +52,7 @@ namespace SudokuSolver.Strategies
                 for (int col = blockMap.StartCol; col < blockMap.StartCol+3; col++)
                 {
                     var cell = sudokuBoard[row, col];
-                    if (cell.ToString().Length > 2)
+                    if (nakedTrio.First != cell && nakedTrio.Second != cell && nakedTrio.Third != cell)
                     {
                         var strValuesToEliminate = nakedTrio.First.ToString() + nakedTrio.Second.ToString() + nakedTrio.Third.ToString();
                         ELiminateNakedTrio(sudokuBoard, strValuesToEliminate, row, col);
@@ -113,7 +113,7 @@ namespace SudokuSolver.Strategies
             for (int row = 0; row < sudokuBoard.GetLength(0); row++)
             {
                 var cell = sudokuBoard[row, givenCol];
-                if (cell != nakedTrio.First && cell != nakedTrio.Second && cell != nakedTrio.Third && cell.ToString().Length > 2)
+                if (cell != nakedTrio.First && cell != nakedTrio.Second && cell != nakedTrio.Third)
                 {
                     var strValuesToEliminate = nakedTrio.First.ToString() + nakedTrio.Second.ToString() + nakedTrio.Third.ToString();
                     ELiminateNakedTrio(sudokuBoard, strValuesToEliminate, row, givenCol);
@@ -163,7 +163,7 @@ namespace SudokuSolver.Strategies
             for (int col = 0; col < sudokuBoard.GetLength(1); col++)
             {
                 var cell = sudokuBoard[givenRow, col];
-                if (cell.ToString().Length > 2)
+                if (nakedTrio.First != cell && nakedTrio.Second != cell && nakedTrio.Third != cell)
                 {
                     var strValuesToEliminate = nakedTrio.First.ToString() + nakedTrio.Second.ToString() + nakedTrio.Third.ToString();
                     ELiminateNakedTrio(sudokuBoard, strValuesToEliminate, givenRow, col);
