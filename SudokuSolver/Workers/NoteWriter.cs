@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace SudokuSolver.Workers
 {
-    internal class PossibilityCalculator
+    internal class NoteWriter
     {
         private readonly SudokuMapper _sudokuMapper;
 
-        public PossibilityCalculator(SudokuMapper sudokuMapper)
+        public NoteWriter(SudokuMapper sudokuMapper)
         {
             _sudokuMapper = sudokuMapper;
         }
 
-        public void Calculate(int[,] sudokuBoard)
+        public void UpdateNotes(int[,] sudokuBoard)
         {
             for (int row = 0; row < sudokuBoard.GetLength(0); row++)
             {
@@ -23,15 +23,15 @@ namespace SudokuSolver.Workers
                 {
                     if (sudokuBoard[row, col] == 0 || sudokuBoard[row, col].ToString().Length > 1)
                     {
-                        var possibilitesInRowAndCol = GetPossibilitiesInRowAndCol(sudokuBoard, row, col);
-                        var possibilitesInBlock = GetPossibilitiesInBlock(sudokuBoard, row, col);
-                        sudokuBoard[row, col] = GetPossibilityIntersection(possibilitesInRowAndCol, possibilitesInBlock);
+                        var notesForRowAndCol = GetNotesForRowAndCol(sudokuBoard, row, col);
+                        var notesForBlock = GetNotesForBlock(sudokuBoard, row, col);
+                        sudokuBoard[row, col] = GetNotesIntersection(notesForRowAndCol, notesForBlock);
                     }
                 }
             }
         }
 
-        private int GetPossibilitiesInRowAndCol(int[,] sudokuBoard, int givenRow, int givenCol)
+        private int GetNotesForRowAndCol(int[,] sudokuBoard, int givenRow, int givenCol)
         {
             int[] possibilities = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
             for (int col = 0; col < 9; col++)
@@ -52,7 +52,7 @@ namespace SudokuSolver.Workers
         }
 
 
-        private int GetPossibilitiesInBlock(int[,] sudokuBoard, int givenRow, int givenCol)
+        private int GetNotesForBlock(int[,] sudokuBoard, int givenRow, int givenCol)
         {
             int[] possibilities = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
             var sudokuMap = _sudokuMapper.Find(givenRow, givenCol);
@@ -69,12 +69,12 @@ namespace SudokuSolver.Workers
             return Convert.ToInt32(string.Join(string.Empty, possibilities.Select(p => p).Where(p => p != 0)));
         }
 
-        private int GetPossibilityIntersection(int possibilitiesInRowAndCol, int possibilitiesInBlock)
+        private int GetNotesIntersection(int notesForRowAndCol, int notesForBlock)
         {
-            var possibilitiesInRowAndColCharArray = possibilitiesInRowAndCol.ToString().ToCharArray();
-            var possibilitiesInBlockCharArray = possibilitiesInBlock.ToString().ToCharArray();
-            var possibilitiesSubset = possibilitiesInRowAndColCharArray.Intersect(possibilitiesInBlockCharArray);
-            return Convert.ToInt32(string.Join(string.Empty, possibilitiesSubset));
+            var notesForRowAndColCharArray = notesForRowAndCol.ToString().ToCharArray();
+            var notesForBlockCharArray = notesForBlock.ToString().ToCharArray();
+            var notesSubset = notesForRowAndColCharArray.Intersect(notesForBlockCharArray);
+            return Convert.ToInt32(string.Join(string.Empty, notesSubset));
         }
 
         private bool IsValidSingle(int cellDigit)

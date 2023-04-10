@@ -12,7 +12,7 @@ namespace SudokuSolver.Strategies
     {
         public int[,] Solve(int[,] sudokuBoard)
         {
-            new PossibilityCalculator(new SudokuMapper()).Calculate(sudokuBoard);
+            new NoteWriter(new SudokuMapper()).UpdateNotes(sudokuBoard);
             new HiddenSinglesStrategy(new SudokuMapper()).Solve(sudokuBoard);
 
             return sudokuBoard;
