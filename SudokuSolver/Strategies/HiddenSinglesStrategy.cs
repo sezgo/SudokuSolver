@@ -3,10 +3,10 @@ using SudokuSolver.Workers;
 
 namespace SudokuSolver.Test.Unit.Strategies
 {
-    internal class HiddenSingleStrategy : ISudokuStrategy
+    internal class HiddenSinglesStrategy : ISudokuStrategy
     {
         private readonly SudokuMapper _sudokuMapper;
-        public HiddenSingleStrategy(SudokuMapper sudokuMapper)
+        public HiddenSinglesStrategy(SudokuMapper sudokuMapper)
         {
             _sudokuMapper = sudokuMapper;
         }
