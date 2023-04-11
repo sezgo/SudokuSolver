@@ -16,6 +16,54 @@ namespace SudokuSolver.Test.Unit.Strategies
         private readonly SudokuBoardStateManager _boardStateManager = new SudokuBoardStateManager();
 
         [TestMethod]
+        public void Solve_NoHiddenPairInCol_DoesntChangeState()
+        {
+            int[,] sudokuBoard =
+            {
+                { 4578, 0, 1, 0, 0, 0, 0, 0, 34789 },
+                { 23458, 0, 0, 0, 0, 0, 0, 0, 16 },
+                { 1, 0, 0, 0, 0, 0, 0, 0, 3478 },
+                { 34789, 0, 0, 0, 0, 0, 0, 0, 234678 },
+                { 234678, 0, 0, 0, 0, 0, 0, 0, 3478 },
+                { 234689, 0, 0, 0, 0, 0, 0, 0, 3478 },
+                { 789, 0, 0, 0, 0, 0, 0, 0, 234689 },
+                { 3478, 0, 0, 0, 0, 0, 0, 0, 5 },
+                { 349, 0, 0, 0, 0, 0, 0, 0, 348 },
+            };
+            var currentState = _boardStateManager.GenerateState(sudokuBoard);
+
+            _hiddenPairStrategy.Solve(sudokuBoard);
+            var nextState = _boardStateManager.GenerateState(sudokuBoard);
+
+            Assert.AreEqual(currentState, nextState);
+        }
+
+        [TestMethod]
+        [DataRow(4, 5, 0, 26)]
+        [DataRow(5, 4, 0, 26)]
+        [DataRow(3, 6, 8, 26)]
+        [DataRow(6, 3, 8, 26)]
+        public void Solve_GivenHiddenPairInCol_SolvesExpectedCell(int row, int row2, int col, int expected)
+        {
+            int[,] sudokuBoard =
+            {
+                { 4578, 0, 1, 0, 0, 0, 0, 0, 34789 },
+                { 3458, 0, 0, 0, 0, 0, 0, 0, 1 },
+                { 1, 0, 0, 0, 0, 0, 0, 0, 3478 },
+                { 34789, 0, 0, 0, 0, 0, 0, 0, 234678 },
+                { 234678, 0, 0, 0, 0, 0, 0, 0, 3478 },
+                { 234689, 0, 0, 0, 0, 0, 0, 0, 3478 },
+                { 789, 0, 0, 0, 0, 0, 0, 0, 234689 },
+                { 3478, 0, 0, 0, 0, 0, 0, 0, 5 },
+                { 349, 0, 0, 0, 0, 0, 0, 0, 348 },
+            };
+
+            _hiddenPairStrategy.Solve(sudokuBoard);
+            Assert.AreEqual(expected, sudokuBoard[row, col]);
+            Assert.AreEqual(expected, sudokuBoard[row2, col]);
+        }
+
+        [TestMethod]
         public void Solve_NoHiddenPairInRow_DoesntChangeState()
         {
             int[,] sudokuBoard =
