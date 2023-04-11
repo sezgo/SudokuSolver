@@ -22,7 +22,6 @@ namespace SudokuSolver.Strategies
         {
             List<ISudokuStrategy> strategies = new List<ISudokuStrategy>()
             {
-                new SimpleMarkUpStrategy(_sudokuMapper),
                 new NakedPairsStrategy(_sudokuMapper), 
                 new NakedTriosStrategy(_sudokuMapper),
             };
