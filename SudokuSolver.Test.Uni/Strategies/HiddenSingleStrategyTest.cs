@@ -8,15 +8,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SudokuSolver.Test.Unit.Strategies.Tests
+namespace SudokuSolver.Test.Unit.Strategies
 {
     [TestClass]
     public class HiddenSingleStrategyTest
     {
-        private readonly HiddenSingleStrategy _hiddenSingleStrategy = new(new SudokuMapper());
+        private readonly HiddenSinglesStrategy _hiddenSingleStrategy = new(new SudokuMapper());
         private readonly SudokuBoardStateManager _sudokuBoardStateManager = new SudokuBoardStateManager();
 
+        [TestMethod]
+        [DataRow(6, 2, 1)]
+        public void Solve_ExampleSudokuBoard_SolvesExpectedCells(int row, int col, int expected)
+        {
+            int[,] sudokuBoard =
+            {
+                { 4578, 478, 9, 1456, 3, 2, 678, 14578, 14568 },
+                { 3458, 348, 348, 7, 145689, 14568, 23689, 1234589, 1245689 },
+                { 1, 6, 2, 45, 4589, 458, 3789, 345789, 4589 },
+                { 34789, 1, 3478, 34, 2, 3478, 5, 6, 489 },
+                { 234678, 3478, 3478, 9, 14568, 1345678, 238, 2348, 248 },
+                { 234689, 5, 348, 346, 468, 3468, 1, 23489, 7 },
+                { 789, 789, 178, 1256, 156, 156, 4, 125789, 3 },
+                { 3478, 2, 6, 1345, 145, 9, 78, 1578, 158 },
+                { 349, 349, 5, 8, 7, 1346, 269, 129, 1269 }
+            };
 
+            _hiddenSingleStrategy.Solve(sudokuBoard);
+
+            Assert.AreEqual(expected, sudokuBoard[row, col]);
+        }
 
         [TestMethod]
         [DataRow(1, 2, 1)]

@@ -13,6 +13,34 @@ namespace SudokuSolver.Test.Unit.Strategies
     {
         NakedTriosStrategy _nakedTriosStrategy = new NakedTriosStrategy(new SudokuMapper());
         SudokuBoardStateManager _boardStateManager = new SudokuBoardStateManager();
+
+        [TestMethod]
+        [DataRow(0, 2, 24)]
+        [DataRow(1, 1, 246)]
+        [DataRow(1, 2, 24)]
+        [DataRow(2, 5, 39)]
+        [DataRow(2, 6, 37)]
+        [DataRow(2, 7, 7)]
+        public void Solve_ExampleSudokuBoard_SolvesExpectedCell(int row, int col, int expected)
+        {
+            int[,] sudokuBoard =
+            {
+                { 3, 7, 2458, 158, 156, 1568, 158, 9, 12458 },
+                { 9, 12468, 2458, 1358, 7, 13568, 1358, 248, 123458 },
+                { 15, 18, 58, 4, 2, 13589, 13578, 78, 6 },
+                { 567, 369, 1, 3579, 8, 4, 2, 67, 37 },
+                { 24567, 23469, 234579, 123579, 1359, 13579, 136789, 4678, 13478 },
+                { 8, 2349, 23479, 6, 139, 1379, 1379, 5, 1347 },
+                { 47, 3489, 6, 35789, 3459, 2, 578, 1, 578 },
+                { 1247, 1248, 2478, 1578, 1456, 15678, 5678, 3, 9 },
+                { 127, 5, 23789, 13789, 1369, 136789, 4, 2678, 278 }
+            };
+
+            _nakedTriosStrategy.Solve(sudokuBoard);
+
+            Assert.AreEqual(expected, sudokuBoard[row, col]);
+        }
+
         [TestMethod]
         [DataRow(0, 0, 2, 2, 9)]
         [DataRow(1, 0, 2, 2, 9)]
