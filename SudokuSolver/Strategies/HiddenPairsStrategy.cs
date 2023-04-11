@@ -36,13 +36,13 @@ namespace SudokuSolver.Strategies
                 if (givenCol == col) continue;
                 
                 var dict = GetDigitOccurrencesDictionaryInRow(sudokuBoard, givenRow);
-                var digits = dict.Select(p => p)
+                var hiddenPairDict = dict.Select(p => p)
                     .Where(p => p.Value.Count() == 2 && p.Value.Contains(givenCol) && p.Value.Contains(col))
                     .ToDictionary(p=> p.Key, p=> p.Value);
                 
-                if (digits.Any())
+                if (hiddenPairDict.Count == 2)
                 {
-                    var cellValue = Convert.ToInt32(string.Join(string.Empty, digits.Keys.Select(k => k).ToList()));
+                    var cellValue = Convert.ToInt32(string.Join(string.Empty, hiddenPairDict.Keys.Select(k => k).ToList()));
                     CleanCellForHiddenPair(sudokuBoard, givenRow, givenCol, cellValue);
                     CleanCellForHiddenPair(sudokuBoard, givenRow, col, cellValue);
                     return;
@@ -72,6 +72,7 @@ namespace SudokuSolver.Strategies
             for (int col = 0; col < sudokuBoard.GetLength(1); col++)
             {
                 var cell = sudokuBoard[givenRow, col];
+                if (cell == 0) continue;
                 var possibilities = cell.ToString().ToCharArray();
 
                 foreach (var possibility in possibilities)
