@@ -11,7 +11,7 @@ namespace SudokuSolver.Test.Unit.Strategies
     [TestClass]
     public class NakedTriosStrategyTest
     {
-        NakedTriosStrategy _nakedTriosStrategy = new NakedTriosStrategy(new SudokuMapper());
+        NakedTriplesStrategy _nakedTriosStrategy = new NakedTriplesStrategy(new SudokuMapper());
         SudokuBoardStateManager _boardStateManager = new SudokuBoardStateManager();
 
         [TestMethod]
@@ -169,6 +169,8 @@ namespace SudokuSolver.Test.Unit.Strategies
         [DataRow(3, 3, 15, 18, 58)]
         // Seventh Block
         [DataRow(7, 0, 58, 15, 18)]
+        // Nineth Block
+        [DataRow(8, 8, 58, 15, 18)]
         public void HasNakedTrioInBlock_GivenTrio_ReturnsFirstFoundTrio(int row, int col, int expectedFirst, int expectedSecond, int expectedThird)
         {
             int[,] sudokuBoard =
@@ -368,23 +370,28 @@ namespace SudokuSolver.Test.Unit.Strategies
         [TestMethod]
         [DataRow(15, 18, 58)]
         [DataRow(18, 15, 58)]
+        [DataRow(18, 15, 18)]
+        [DataRow(18, 15, 15)]
         [DataRow(15, 21, 25)]
         [DataRow(15, 25, 21)]
         [DataRow(34, 45, 35)]
+        [DataRow(17, 18, 78)]
+        [DataRow(157, 157, 57)]
+        [DataRow(178, 178, 178)]
         public void IsNakedTrio_ProperNakedTrio_ReturnsTrue(int first, int second, int third)
         {
-            Assert.IsTrue(_nakedTriosStrategy.IsNakedTrio(first, second, third));
+            Assert.IsTrue(_nakedTriosStrategy.IsNakedTriple(first, second, third));
         }
 
         [TestMethod]
         [DataRow(18, 15, 57)]
-        [DataRow(18, 15, 18)]
-        [DataRow(18, 15, 15)]
         [DataRow(15, 21, 23)]
         [DataRow(35, 46, 34)]
+        [DataRow(157, 157, 1)]
+        [DataRow(178, 178, 1)]
         public void IsNakedTrio_NonNakedTrio_ReturnsFalse(int first, int second, int third)
         {
-            Assert.IsFalse(_nakedTriosStrategy.IsNakedTrio(first, second, third));
+            Assert.IsFalse(_nakedTriosStrategy.IsNakedTriple(first, second, third));
 
         }
 
