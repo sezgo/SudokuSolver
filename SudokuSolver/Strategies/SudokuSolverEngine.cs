@@ -23,7 +23,7 @@ namespace SudokuSolver.Strategies
             List<ISudokuStrategy> strategies = new List<ISudokuStrategy>()
             {
                 new NakedPairsStrategy(_sudokuMapper), 
-                new NakedTriosStrategy(_sudokuMapper),
+                new NakedTriplesStrategy(_sudokuMapper),
             };
 
             var currentState = _sudokuBoardStateManager.GenerateState(sudokuBoard);
