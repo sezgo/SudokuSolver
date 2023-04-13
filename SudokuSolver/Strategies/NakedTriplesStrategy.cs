@@ -72,34 +72,35 @@ namespace SudokuSolver.Strategies
         {
             SudokuMap blockMap = _sudokuMapper.Find(givenRow, givenCol);
 
+            var givenCellIndex = _sudokuMapper.GetCellIndex(givenRow, givenCol);
 
-
-            for (int row = blockMap.StartRow; row < blockMap.StartRow + 3; row++)
+            for (int secondCellIndex = 0; secondCellIndex < sudokuBoard.GetLength(0); secondCellIndex++)
             {
-                for (int col = blockMap.StartCol; col < blockMap.StartCol + 3; col++)
+                for (int thirdCellIndex = 0; thirdCellIndex < sudokuBoard.GetLength(0); thirdCellIndex++)
                 {
-                    for (int row2 = blockMap.StartRow; row2 < blockMap.StartRow + 3; row2++)
+                    if (!AreSameCells(givenCellIndex, secondCellIndex, thirdCellIndex))
                     {
-                        for (int col2 = blockMap.StartCol; col2 < blockMap.StartCol + 3; col2++)
+                        var secondRow = _sudokuMapper.GetCellRow(secondCellIndex, blockMap);
+                        var secondCol = _sudokuMapper.GetCellCol(secondCellIndex, blockMap);
+                        
+                        var thirdRow = _sudokuMapper.GetCellRow(thirdCellIndex, blockMap);
+                        var thirdCol = _sudokuMapper.GetCellCol(thirdCellIndex, blockMap);
+                        
+                        if (IsNakedTriple(sudokuBoard[givenRow, givenCol], 
+                            sudokuBoard[secondRow, secondCol],
+                            sudokuBoard[thirdRow, thirdCol]))
                         {
-                            
-                            if (!AreSameCells(givenRow, givenCol, row, col) && !AreSameCells(givenRow, givenCol, row2, col2) && !AreSameCells(row, col, row2, col2))
-                            {
-                                
-                                if (IsNakedTriple(sudokuBoard[givenRow, givenCol], sudokuBoard[row, col], sudokuBoard[row2, col2]))
-                                {
-                                    return (
-                                        First: sudokuBoard[givenRow, givenCol],
-                                        Second: sudokuBoard[row, col],
-                                        Third: sudokuBoard[row2, col2],
-                                        IsNakedTriple: true
-                                        );
-                                }
-                            }
+                            return (
+                                First: sudokuBoard[givenRow, givenCol],
+                                Second: sudokuBoard[secondRow, secondCol],
+                                Third: sudokuBoard[thirdRow, thirdCol],
+                                IsNakedTriple: true
+                                );
                         }
                     }
                 }
             }
+
             return (-1, -1,-1,false);
         }
 
@@ -263,9 +264,9 @@ namespace SudokuSolver.Strategies
         /// <param name="row2">Row of the second cell.</param>
         /// <param name="col2">Column of the second cell.</param>
         /// <returns>Returns true if the two cells are the same and false otherwise.</returns>
-        private bool AreSameCells(int row1, int col1, int row2, int col2)
+        private bool AreSameCells(int index1, int index2, int index3)
         {
-            return (row1 == row2 && col1 == col2);
+            return (index1 == index2 || index1 == index3 || index2 == index3);
         }
     }
 }
