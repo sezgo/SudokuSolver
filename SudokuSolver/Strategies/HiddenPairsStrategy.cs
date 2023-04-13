@@ -41,12 +41,12 @@ namespace SudokuSolver.Strategies
         {
             var dict = GetDigitOccurrencesDictionaryInBlock(sudokuBoard, givenRow, givenCol); 
             var map = _sudokuMapper.Find(givenRow, givenCol);
-            var givenCellIndex  = (givenRow - map.StartRow) * 3 + (givenCol - map.StartCol);
+            var givenCellIndex  = _sudokuMapper.GetCellIndex(givenRow, givenCol);
 
             for (int cellIndex = 0; cellIndex < sudokuBoard.GetLength(0); cellIndex++)
             {
-                var row = (cellIndex / 3) + map.StartRow;
-                var col = (cellIndex % 3) + map.StartCol;
+                var row = _sudokuMapper.GetCellRow(cellIndex, map);
+                var col = _sudokuMapper.GetCellCol(cellIndex, map);
 
                 if (givenRow == row && givenCol == col) continue;
 
@@ -85,8 +85,8 @@ namespace SudokuSolver.Strategies
             for (int cellIndex = 0; cellIndex < sudokuBoard.GetLength(0); cellIndex++)
             {
 
-                var row = (cellIndex / 3) + map.StartRow;
-                var col = (cellIndex % 3) + map.StartCol;
+                var row = _sudokuMapper.GetCellRow(cellIndex, map);
+                var col = _sudokuMapper.GetCellCol(cellIndex, map);
 
                 var cell = sudokuBoard[row, col];
                 if (cell == 0) continue;
