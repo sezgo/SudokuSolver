@@ -29,6 +29,12 @@ namespace SudokuSolver.Strategies
             return sudokuBoard;
         }
 
+        /// <summary>
+        /// If there is a naked quad in the block, removes all of the naked quad's digits from the notes of the other cells.
+        /// </summary>
+        /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
+        /// <param name="givenRow">Row of the pivot cell.</param>
+        /// <param name="givenCol">Column of the pivot cell.</param>
         private void SolveNakedQuadForInBlock(int[,] sudokuBoard, int givenRow, int givenCol)
         {
             var nakedQuad = HasNakedQuadInBlock(sudokuBoard, givenRow, givenCol);
@@ -52,6 +58,13 @@ namespace SudokuSolver.Strategies
             }
         }
 
+        /// <summary>
+        /// Checks if there exist another three cells in the same block for the given cell with the given row and column info, so that they make a naked quad together.
+        /// </summary>
+        /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
+        /// <param name="givenRow">Row of the pivot cell.</param>
+        /// <param name="givenCol">Column of the pivot cell.</param>
+        /// <returns>A tuple with the the four naked numbers, and a bool value: IsNakedQuad, true if a proper naked quad, false otherwise.</returns>
         private (int First, int Second, int Third, int Fourth, bool IsNakedQuad) HasNakedQuadInBlock(int[,] sudokuBoard, int givenRow, int givenCol)
         {
             SudokuMap blockMap = _sudokuMapper.Find(givenRow, givenCol);
@@ -96,6 +109,12 @@ namespace SudokuSolver.Strategies
             return (-1, -1, -1, -1, false);
         }
 
+        /// <summary>
+        /// If there is a naked quad in the column, removes the all of the naked quad's digits from the notes of the other cells.
+        /// </summary>
+        /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
+        /// <param name="givenRow">Row of the pivot cell.</param>
+        /// <param name="givenCol">Column of the pivot cell.</param>
         private void SolveNakedQuadForInCol(int[,] sudokuBoard, int givenRow, int givenCol)
         {
             var nakedQuad = HasNakedQuadInCol(sudokuBoard, givenRow, givenCol);
@@ -111,6 +130,14 @@ namespace SudokuSolver.Strategies
             }
         }
 
+        /// <summary>
+        /// Checks if there exist another three cells in the same column for the given cell with the given row and column info, so that they make a naked quad together.
+        /// </summary>
+        /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
+        /// <param name="givenRow">Row of the pivot cell.</param>
+        /// <param name="givenCol">Column of the pivot cell.</param>
+        /// <param name="givenCol">Column of the pivot cell.</param>
+        /// <returns>A tuple with the the four naked numbers, and a bool value: IsNakedQuad, true if a proper naked quad, false otherwise.</returns>
         private (int First, int Second, int Third, int Fourth, bool IsNakedQuad) HasNakedQuadInCol(int[,] sudokuBoard, int givenRow, int givenCol)
         {
             for (int row2 = 0; row2 < sudokuBoard.GetLength(0); row2++)
@@ -136,6 +163,12 @@ namespace SudokuSolver.Strategies
             return (-1, -1, -1, -1, false);
         }
 
+        /// <summary>
+        /// If there is a naked quad in the row, removes the all of the naked quad's digits from the notes of the other cells.
+        /// </summary>
+        /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
+        /// <param name="givenRow">Row of the pivot cell.</param>
+        /// <param name="givenCol">Column of the pivot cell.</param>
         private void SolveNakedQuadForInRow(int[,] sudokuBoard, int givenRow, int givenCol)
         {
             var nakedQuad = HasNakedQuadInRow(sudokuBoard, givenRow, givenCol);
@@ -151,6 +184,13 @@ namespace SudokuSolver.Strategies
             }
         }
 
+        /// <summary>
+        /// Checks if there exist another three cells in the same row for the given cell with the given row and column info, so that they make a naked Triple together.
+        /// </summary>
+        /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
+        /// <param name="givenRow">Row of the pivot cell.</param>
+        /// <param name="givenCol">Column of the pivot cell.</param>
+        /// <returns>A tuple with the the four naked numbers, and a bool value: IsNakedQuad, true if a proper naked quad, false otherwise.</returns>
         internal (int First, int Second, int Third, int Fourth, bool IsNakedQuad) HasNakedQuadInRow(int[,] sudokuBoard, int givenRow, int givenCol)
         {
             for (int col2 = 0; col2 < sudokuBoard.GetLength(1); col2++)
@@ -176,7 +216,13 @@ namespace SudokuSolver.Strategies
             return (-1, -1, -1, -1, false);
         }
 
-
+        /// <summary>
+        /// Eliminates the given values from the cell with the given row and column info.
+        /// </summary>
+        /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
+        /// <param name="strValuesToEliminate">Values to be removed from the cell.</param>
+        /// <param name="eliminateFromRow">The row of the given cell from which the given values are to be removed.</param>
+        /// <param name="eliminateFromCol">The column of the given cell from which the given values are to be removed.</param>
         private void EliminateNakedQuad(int[,] sudokuBoard, string strValuesToEliminate, int eliminateFromRow, int eliminateFromCol)
         {
             var valuesToEliminateSet = strValuesToEliminate.ToHashSet();
@@ -189,7 +235,20 @@ namespace SudokuSolver.Strategies
             }
         }
 
-
+        /// <summary>
+        /// Checks the given four numbers, if they are a naked quad.
+        /// A naked quad occurs when you have exactly four cells within a row, column or a 3x3 region
+        /// where the only candidates are the same four digits or a subset of these four digits.
+        /// </summary>
+        /// 
+        /// <example>12, 24, 23, 34</example>
+        /// <example>1234, 1234, 123, 34</example>
+        /// 
+        /// <param name="firstNaked"></param>
+        /// <param name="secondNaked"></param>
+        /// <param name="thirdNaked"></param>
+        /// <param name="fourthNaked"></param>
+        /// <returns>True if given numbers are a naked quad, false otherwise.</returns>
         internal bool IsNakedQuad(int firstNaked, int secondNaked, int thirdNaked, int fourthNaked)
         {
 
@@ -210,6 +269,14 @@ namespace SudokuSolver.Strategies
             return set.Count == 4;
         }
 
+        /// <summary>
+        /// Checks if any of the four cells with the given indexes are same.
+        /// </summary>
+        /// <param name="index1"></param>
+        /// <param name="index2"></param>
+        /// <param name="index3"></param>
+        /// <param name="index4"></param>
+        /// <returns>True if all cells are different, and false otherwise.</returns>
         public bool AreSameCells(int index1, int index2, int index3, int index4)
         {
             return new HashSet<int> { index1, index2, index3, index4}.Count != 4;
