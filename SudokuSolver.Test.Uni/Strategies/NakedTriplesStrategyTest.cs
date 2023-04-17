@@ -132,12 +132,12 @@ namespace SudokuSolver.Test.Unit.Strategies
         }
 
         [TestMethod]
-        [DataRow(0, 0, 2, 2, 9)]
-        [DataRow(1, 0, 2, 2, 9)]
-        [DataRow(1, 1, 2, 2, 9)]
-        [DataRow(0, 7, 0, 6, 3)]
-        [DataRow(3, 3, 3, 4, 7)]
-        public void EliminateNakedTripleFromOthersInBlock_GivenNakedTriple_ChangesExpectedCells(int row, int col, int checkRow, int checkCol, int expectedVal)
+        [DataRow(0, 2, 2, 9)]
+        [DataRow(0, 2, 2, 9)]
+        [DataRow(0, 2, 2, 9)]
+        [DataRow(2, 0, 6, 3)]
+        [DataRow(4, 3, 4, 7)]
+        public void EliminateNakedTripleFromOthersInBlock_GivenNakedTriple_ChangesExpectedCells(int blockIndex, int checkRow, int checkCol, int expectedVal)
         {
             int[,] sudokuBoard = {
                 { 15, 0, 0, 0, 0, 0, 1234, 12, 14 },
@@ -151,44 +151,15 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             };
 
-            _nakedTriplesStrategy.EliminateNakedTripleFromOthersInBlock(sudokuBoard, row, col);
+            _nakedTriplesStrategy.SolveNakedTripleOnBlock(sudokuBoard, blockIndex);
             Assert.AreEqual(expectedVal, sudokuBoard[checkRow, checkCol]);
         }
 
         [TestMethod]
-        [DataRow(0, 3)]
-        [DataRow(3, 6)]
-        [DataRow(6, 0)]
-        [DataRow(6, 6)]
-        [DataRow(0, 1)]
-        public void EliminateNakedTripleFromOthersInBlock_EmptyCellAndCellWithoutTriple_DoesntChangeState(int row, int col)
-        {
-            int[,] sudokuBoard = {
-                { 15, 0, 0, 0, 0, 0, 1234, 12, 14 },
-                { 18, 58, 0, 0, 0, 0, 24, 0, 0 },
-                { 0, 0, 1589, 0, 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 25, 237, 0, 0, 0, 0 },
-                { 0, 0, 0, 35, 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0, 23, 0, 0, 0 },
-                { 0, 0, 0, 0, 0, 0, 12, 0, 0 },
-                { 0, 0, 0, 0, 0, 0, 0, 58, 0 },
-                { 0, 0, 0, 0, 0, 0, 61, 24, 0 },
-            };
-
-            var initialState = _boardStateManager.GenerateState(sudokuBoard);
-            
-
-            _nakedTriplesStrategy.EliminateNakedTripleFromOthersInBlock(sudokuBoard, row, col);
-
-            var nextState = _boardStateManager.GenerateState(sudokuBoard);
-            Assert.AreEqual(initialState, nextState);
-        }
-
-        [TestMethod]
-        [DataRow(0, 0, 4, 6)]
-        [DataRow(0, 0, 3, 79)]
-        [DataRow(8, 6, 0, 34)]
-        public void EliminateNakedTripleFromOthersInCol_GivenTriple_ChangesState(int row, int col, int changeRow, int expected)
+        [DataRow(0, 4, 6)]
+        [DataRow(0, 3, 79)]
+        [DataRow(6, 0, 34)]
+        public void EliminateNakedTripleFromOthersInCol_GivenTriple_ChangesState(int col, int changeRow, int expected)
         {
             int[,] sudokuBoard =
             {
@@ -203,14 +174,14 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 34, 0, 0, 0, 0, 0, 25, 0, 0 },
             };
 
-            _nakedTriplesStrategy.EliminateNakedTripleFromOthersInCol(sudokuBoard, row, col);
+            _nakedTriplesStrategy.SolveNakedTripleOnCol(sudokuBoard, col);
             Assert.AreEqual(expected, sudokuBoard[changeRow, col]);
         }
 
         [TestMethod]
-        [DataRow(0, 0, 4, 7)]
-        [DataRow(0, 0, 2, 89)]
-        public void ELiminateNakedTripleFromOthersInRow_GivenTriple_ChangesState(int row, int col, int changedCol, int expected)
+        [DataRow(0, 4, 7)]
+        [DataRow(0, 2, 89)]
+        public void ELiminateNakedTripleFromOthersInRow_GivenTriple_ChangesState(int row, int changedCol, int expected)
         {
             int[,] sudokuBoard =
             {
@@ -224,14 +195,14 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             };
-            _nakedTriplesStrategy.ELiminateNakedTripleFromOthersInRow(sudokuBoard, row, col);
+            _nakedTriplesStrategy.SolveNakedTripleOnRow(sudokuBoard, row);
             Assert.AreEqual(expected, sudokuBoard[row, changedCol]);
         }
 
         [TestMethod]
         [DataRow("345", 0, 4, 7)]
         [DataRow("123", 8, 8, 4)]
-        public void ELiminateNakedTriple_ProperValues_ReturnsSingle(string valuesToEliminate, int row, int col, int expected)
+        public void ELiminateNakedTriple_ProperValues_ReturnsExpectedCells(string valuesToEliminate, int row, int col, int expected)
         {
             int[,] sudokuBoard =
             {
@@ -252,16 +223,16 @@ namespace SudokuSolver.Test.Unit.Strategies
 
         [TestMethod]
         // First Block
-        [DataRow(0, 0, 15, 18, 58)]
-        [DataRow(0, 1, 18, 15, 58)]
-        [DataRow(1, 0, 58, 15, 18)]
+        [DataRow(0, 15, 18, 58)]
+        [DataRow(0, 15, 18, 58)]
+        [DataRow(0, 15, 18, 58)]
         // Fifth Block
-        [DataRow(3, 3, 15, 18, 58)]
+        [DataRow(4, 15, 18, 58)]
         // Seventh Block
-        [DataRow(7, 0, 58, 15, 18)]
+        [DataRow(6, 58, 15, 18)]
         // Nineth Block
-        [DataRow(8, 8, 58, 15, 18)]
-        public void HasNakedTripleInBlock_GivenTriple_ReturnsFirstFoundTriple(int row, int col, int expectedFirst, int expectedSecond, int expectedThird)
+        [DataRow(8, 15, 18, 58)]
+        public void HasNakedTripleInBlock_GivenTriple_ReturnsFirstFoundTriple(int blockIndex, int expectedFirst, int expectedSecond, int expectedThird)
         {
             int[,] sudokuBoard =
             {
@@ -276,7 +247,7 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 0, 0, 0, 0, 0, 0, 15, 18, 58 },
             };
 
-            var Triple = _nakedTriplesStrategy.HasNakedTripleInBlock(sudokuBoard, row, col);
+            var Triple = _nakedTriplesStrategy.HasNakedTripleOnBlock(sudokuBoard, blockIndex);
             Assert.IsTrue(Triple.IsNakedTriple);
             Assert.AreEqual(expectedFirst, Triple.First);
             Assert.AreEqual(expectedSecond, Triple.Second);
@@ -285,11 +256,11 @@ namespace SudokuSolver.Test.Unit.Strategies
         }
 
         [TestMethod]
-        [DataRow(0, 6)]
-        [DataRow(3, 0)]
-        [DataRow(3, 6)]
-        [DataRow(6, 3)]
-        public void HasNakedTripleInBlock_EmptyBlock_ReturnsNonTripleTuple(int row, int col, int expectedTripleValue = -1)
+        [DataRow(2)]
+        [DataRow(3)]
+        [DataRow(5)]
+        [DataRow(7)]
+        public void HasNakedTripleInBlock_EmptyBlock_ReturnsNonTripleTuple(int blockIndex, int expectedTripleValue = -1)
         {
             int[,] sudokuBoard =
             {
@@ -304,17 +275,17 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 0, 0, 0, 0, 0, 0, 15, 18, 58 },
             };
 
-            var Triple = _nakedTriplesStrategy.HasNakedTripleInBlock(sudokuBoard, row, col);
+            var Triple = _nakedTriplesStrategy.HasNakedTripleOnBlock(sudokuBoard, blockIndex);
             Assert.IsFalse(Triple.IsNakedTriple);
             Assert.AreEqual((expectedTripleValue, expectedTripleValue, expectedTripleValue, false), Triple);
 
         }
 
         [TestMethod]
-        [DataRow(0, 6)]
-        [DataRow(0, 7)]
-        [DataRow(2, 8)]
-        public void HasNakedTripleInBlock_TripleDeosntExist_ReturnsNonTripleTuple(int row, int col, int expectedTripleValue = -1)
+        [DataRow(2)]
+        [DataRow(2)]
+        [DataRow(2)]
+        public void HasNakedTripleInBlock_TripleDeosntExist_ReturnsNonTripleTuple(int blockIndex, int expectedTripleValue = -1)
         {
             int[,] sudokuBoard =
             {
@@ -329,16 +300,16 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 0, 0, 0, 0, 0, 0, 15, 18, 58 },
             };
 
-            var Triple = _nakedTriplesStrategy.HasNakedTripleInBlock(sudokuBoard, row, col);
+            var Triple = _nakedTriplesStrategy.HasNakedTripleOnBlock(sudokuBoard, blockIndex);
             Assert.IsFalse(Triple.IsNakedTriple);
             Assert.AreEqual((expectedTripleValue, expectedTripleValue, expectedTripleValue, false), Triple);
 
         }
 
         [TestMethod]
-        [DataRow(0, 0)]
-        [DataRow(8, 6)]
-        public void HasNakedTripleInCol_GivenTriple_ReturnsTrue(int row, int col)
+        [DataRow(0)]
+        [DataRow(6)]
+        public void HasNakedTripleInCol_GivenTriple_ReturnsTrue(int col)
         {
             int[,] sudokuBoard =
             {
@@ -352,13 +323,13 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 45, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 34, 0, 0, 0, 0, 0, 25, 0, 0 },
             };
-            Assert.IsTrue(_nakedTriplesStrategy.HasNakedTripleInCol(sudokuBoard, row, col).IsNakedTriple);
+            Assert.IsTrue(_nakedTriplesStrategy.HasNakedTripleOnCol(sudokuBoard, col).IsNakedTriple);
         }
 
         [TestMethod]
-        [DataRow(0, 8)]
-        [DataRow(0, 1)]
-        public void HasNakedTripleInCol_TripleDoesntExist_ReturnsFalse(int row, int col)
+        [DataRow(8)]
+        [DataRow(1)]
+        public void HasNakedTripleInCol_TripleDoesntExist_ReturnsFalse(int col)
         {
             int[,] sudokuBoard =
             {
@@ -372,13 +343,13 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 45, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 34, 0, 0, 0, 0, 0, 25, 0, 0 },
             };
-            Assert.IsFalse(_nakedTriplesStrategy.HasNakedTripleInCol(sudokuBoard, row, col).IsNakedTriple);
+            Assert.IsFalse(_nakedTriplesStrategy.HasNakedTripleOnCol(sudokuBoard, col).IsNakedTriple);
         }
 
         [TestMethod]
-        [DataRow(0, 3)]
-        [DataRow(0, 8)]
-        public void HasNakedTripleInCol_EmptyCol_ReturnsFalse(int row, int col)
+        [DataRow(3)]
+        [DataRow(8)]
+        public void HasNakedTripleInCol_EmptyCol_ReturnsFalse(int col)
         {
             int[,] sudokuBoard =
             {
@@ -392,15 +363,15 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 45, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 34, 0, 0, 0, 0, 0, 25, 0, 0 },
             };
-            Assert.IsFalse(_nakedTriplesStrategy.HasNakedTripleInCol(sudokuBoard, row, col).IsNakedTriple);
+            Assert.IsFalse(_nakedTriplesStrategy.HasNakedTripleOnCol(sudokuBoard, col).IsNakedTriple);
         }
 
         [TestMethod]
-        [DataRow(0, 0)]
-        [DataRow(0, 7)]
-        [DataRow(0, 8)]
-        [DataRow(8, 1)]
-        public void HasNakedTripleInRow_NakedTripleExists_ReturnsTrue(int row, int col)
+        [DataRow(0)]
+        [DataRow(0)]
+        [DataRow(0)]
+        [DataRow(8)]
+        public void HasNakedTripleInRow_NakedTripleExists_ReturnsTrue(int row)
         {
             int[,] sudokuBoard =
             {
@@ -414,13 +385,13 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 23, 34, 0, 24, 0, 1234, 0, 0 },
             };
-            Assert.IsTrue(_nakedTriplesStrategy.HasNakedTripleInRow(sudokuBoard, row, col).IsNakedTriple);
+            Assert.IsTrue(_nakedTriplesStrategy.HasNakedTripleOnRow(sudokuBoard, row).IsNakedTriple);
         }
 
         [TestMethod]
-        [DataRow(2, 0)]
-        [DataRow(5, 7)]
-        public void HasNakedTripleInRow_EmptyRow_ReturnsFalse(int row, int col)
+        [DataRow(2)]
+        [DataRow(5)]
+        public void HasNakedTripleInRow_EmptyRow_ReturnsFalse(int row)
         {
             int[,] sudokuBoard =
             {
@@ -434,13 +405,13 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             };
-            Assert.IsFalse(_nakedTriplesStrategy.HasNakedTripleInRow(sudokuBoard, row, col).IsNakedTriple);
+            Assert.IsFalse(_nakedTriplesStrategy.HasNakedTripleOnRow(sudokuBoard, row).IsNakedTriple);
         }
 
         [TestMethod]
-        [DataRow(2, 0)]
-        [DataRow(4, 7)]
-        public void HasNakedTripleInRow_NakedTripleDoesntExist_ReturnsFalse(int row, int col)
+        [DataRow(2)]
+        [DataRow(4)]
+        public void HasNakedTripleInRow_NakedTripleDoesntExist_ReturnsFalse(int row)
         {
             int[,] sudokuBoard =
             {
@@ -454,7 +425,7 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             };
-            Assert.IsFalse(_nakedTriplesStrategy.HasNakedTripleInRow(sudokuBoard, row, col).IsNakedTriple);
+            Assert.IsFalse(_nakedTriplesStrategy.HasNakedTripleOnRow(sudokuBoard, row).IsNakedTriple);
         }
 
         [TestMethod]

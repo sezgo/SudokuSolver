@@ -197,7 +197,7 @@ namespace SudokuSolver.Test.Unit.Strategies
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             };
-            Assert.IsTrue(_nakedQuadsStrategy.HasNakedQuadInRow(sudokuBoard, row, col).IsNakedQuad);
+            Assert.IsTrue(_nakedQuadsStrategy.HasNakedQuadOnRow(sudokuBoard, row).IsNakedQuad);
         }
 
         [TestMethod]
