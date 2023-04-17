@@ -12,6 +12,48 @@ namespace SudokuSolver.Test.Unit.Strategies
     public class NakedPairsStrategyTest
     {
         private readonly ISudokuStrategy _nakedPairsStrategy = new NakedPairsStrategy(new SudokuMapper());
+        private readonly SudokuBoardStateManager _boardStateManager = new SudokuBoardStateManager();
+        [TestMethod]
+        public void Solve_NakedPairOnRow_ReturnsExpectedSudoukoBoardState()
+        {
+            int[,] sudokuBoard =
+            {
+                { 8, 4, 3567, 2, 357, 357, 36, 9, 1 },
+                { 23, 2357, 357, 1, 6, 9, 4, 23, 8 },
+                { 1, 236, 9, 4, 38, 38, 236, 5, 7 },
+                { 7, 1, 8, 3, 2, 4, 59, 6, 59 },
+                { 349, 35, 2, 59, 178, 6, 35789, 1347, 3459 },
+                { 3469, 356, 3456, 59, 178, 78, 235789, 12347, 23459 },
+                { 234, 237, 1, 6, 9, 235, 2357, 8, 2345 },
+                { 2346, 9, 3467, 8, 35, 235, 1, 2347, 23456 },
+                { 5, 8, 36, 7, 4, 1, 2369, 23, 2369 }
+            };
+            int[,] expectedsudokuBoard =
+            {
+                { 8, 4, 36, 2, 57, 57, 36, 9, 1 },
+                { 23, 57, 57, 1, 6, 9, 4, 23, 8 },
+                { 1, 26, 9, 4, 38, 38, 26, 5, 7 },
+                { 7, 1, 8, 3, 2, 4, 59, 6, 59 },
+                { 349, 35, 2, 59, 178, 6, 378, 147, 34 },
+                { 3469, 356, 45, 59, 178, 78, 2378, 147, 234 },
+                { 234, 237, 1, 6, 9, 235, 2357, 8, 2345 },
+                { 236, 9, 47, 8, 35, 235, 1, 47, 2356 },
+                { 5, 8, 36, 7, 4, 1, 2369, 23, 2369 }
+            };
+
+            string currentState;
+            string solvedState;
+            do
+            {
+                currentState = _boardStateManager.GenerateState(sudokuBoard);
+                _nakedPairsStrategy.Solve(sudokuBoard);
+                solvedState = _boardStateManager.GenerateState(sudokuBoard);
+
+            } while (currentState != solvedState);
+            string expectedState = _boardStateManager.GenerateState(expectedsudokuBoard);
+
+            Assert.AreEqual(expectedState, solvedState);
+        }
 
         [TestMethod]
         [DataRow(0, 3, 6)]

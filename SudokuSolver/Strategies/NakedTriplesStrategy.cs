@@ -1,11 +1,5 @@
 ﻿using SudokuSolver.Data;
 using SudokuSolver.Workers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SudokuSolver.Strategies
 {
@@ -16,105 +10,96 @@ namespace SudokuSolver.Strategies
             _sudokuMapper = sudokuMapper;
         }
 
-        /// <summary>
-        /// Attempts solving the given sudoku board with the Naked Triple Strategy.
-        /// </summary>
-        /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
-        /// <returns>The state of the sudoku board after solving attempt.</returns>
         public int[,] Solve(int[,] sudokuBoard)
         {
-            for (int row = 0; row < sudokuBoard.GetLength(1); row++)
+            for (int index = 0; index < Constants.MaxGroupLength; index++)
             {
-                for (int col = 0; col < sudokuBoard.GetLength(1); col++)
-                {
-                    ELiminateNakedTripleFromOthersInRow(sudokuBoard, row, col);
-                    EliminateNakedTripleFromOthersInCol(sudokuBoard, row, col);
-                    EliminateNakedTripleFromOthersInBlock(sudokuBoard, row, col);
-                }
+                SolveNakedTripleOnRow(sudokuBoard, index);
+                SolveNakedTripleOnCol(sudokuBoard, index);
+                SolveNakedTripleOnBlock(sudokuBoard, index);
             }
+
             return sudokuBoard;
         }
 
         /// <summary>
-        /// If a cell in the same block as the naked Triple has more than three digit notes, removes the all of the naked Triple's digits from the notes.
+        /// If there is a naked triple in the block, removes the all of the naked triple digits from the notes of the other cells.
         /// </summary>
         /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
-        /// <param name="givenRow">Row of the pivot cell.</param>
-        /// <param name="givenCol">Column of the pivot cell.</param>
-        internal void EliminateNakedTripleFromOthersInBlock(int[,] sudokuBoard, int givenRow, int givenCol)
+        /// <param name="givenBlockIndex">The given block index.</param>
+        internal void SolveNakedTripleOnBlock(int[,] sudokuBoard, int givenBlockIndex)
         {
-            var nakedTriple = HasNakedTripleInBlock(sudokuBoard, givenRow, givenCol);
+            var nakedTriple = HasNakedTripleOnBlock(sudokuBoard, givenBlockIndex);
             if (!nakedTriple.IsNakedTriple) return;
 
-            SudokuMap blockMap = _sudokuMapper.Find(givenRow, givenCol);
-            for (int row = blockMap.StartRow; row < blockMap.StartRow+3; row++)
+            SudokuMap blockMap = _sudokuMapper.Find(givenBlockIndex);
+
+            for (int cellIndex = 0; cellIndex < Constants.MaxGroupLength; cellIndex++)
             {
-                for (int col = blockMap.StartCol; col < blockMap.StartCol+3; col++)
+                var cellRow = _sudokuMapper.GetCellRow(cellIndex, blockMap);
+                var cellCol = _sudokuMapper.GetCellCol(cellIndex, blockMap);
+                var cell = sudokuBoard[cellRow, cellCol];
+                if (nakedTriple.First != cell && nakedTriple.Second != cell && nakedTriple.Third != cell)
                 {
-                    var cell = sudokuBoard[row, col];
-                    if (nakedTriple.First != cell && nakedTriple.Second != cell && nakedTriple.Third != cell)
-                    {
-                        var strValuesToEliminate = nakedTriple.First.ToString() + nakedTriple.Second.ToString() + nakedTriple.Third.ToString();
-                        ELiminateNakedTriple(sudokuBoard, strValuesToEliminate, row, col);
-                    }
+                    var strValuesToEliminate = nakedTriple.First.ToString() + nakedTriple.Second.ToString() + nakedTriple.Third.ToString();
+                    ELiminateNakedTriple(sudokuBoard, strValuesToEliminate, cellRow, cellCol);
                 }
             }
         }
 
         /// <summary>
-        /// Checks if there exist another two cells in the same block for the given cell with the given row and column info, so that they make a naked Triple together.
+        /// Checks if there is a naked triple in the given block.
         /// </summary>
         /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
-        /// <param name="givenRow">Row of the pivot cell.</param>
-        /// <param name="givenCol">Column of the pivot cell.</param>
+        /// <param name="givenBlockIndex">The given block index.</param>
         /// <returns>A tuple with the the three naked numbers, and a bool value: IsNakedTriple, true if a proper naked Triple, false otherwise.</returns>
-        internal (int First, int Second, int Third, bool IsNakedTriple) HasNakedTripleInBlock(int[,] sudokuBoard, int givenRow, int givenCol)
+        internal (int First, int Second, int Third, bool IsNakedTriple) HasNakedTripleOnBlock(int[,] sudokuBoard, int givenBlockIndex)
         {
-            SudokuMap blockMap = _sudokuMapper.Find(givenRow, givenCol);
+            SudokuMap blockMap = _sudokuMapper.Find(givenBlockIndex);
 
-            var givenCellIndex = _sudokuMapper.GetCellIndex(givenRow, givenCol);
-
-            for (int secondCellIndex = 0; secondCellIndex < sudokuBoard.GetLength(0); secondCellIndex++)
+            for (int firstCellIndex = 0; firstCellIndex < Constants.MaxGroupLength; firstCellIndex++)
+            for (int secondCellIndex = 0; secondCellIndex < Constants.MaxGroupLength; secondCellIndex++)
+            for (int thirdCellIndex = 0; thirdCellIndex < Constants.MaxGroupLength; thirdCellIndex++)
             {
-                for (int thirdCellIndex = 0; thirdCellIndex < sudokuBoard.GetLength(0); thirdCellIndex++)
+                if (!AreSameCells(firstCellIndex, secondCellIndex, thirdCellIndex))
                 {
-                    if (!AreSameCells(givenCellIndex, secondCellIndex, thirdCellIndex))
+                    var firstRow = _sudokuMapper.GetCellRow(firstCellIndex, blockMap);
+                    var firstCol = _sudokuMapper.GetCellCol(firstCellIndex, blockMap);
+
+                    var secondRow = _sudokuMapper.GetCellRow(secondCellIndex, blockMap);
+                    var secondCol = _sudokuMapper.GetCellCol(secondCellIndex, blockMap);
+                        
+                    var thirdRow = _sudokuMapper.GetCellRow(thirdCellIndex, blockMap);
+                    var thirdCol = _sudokuMapper.GetCellCol(thirdCellIndex, blockMap);
+                        
+                    if (IsNakedTriple(sudokuBoard[firstRow, firstCol], 
+                        sudokuBoard[secondRow, secondCol],
+                        sudokuBoard[thirdRow, thirdCol]))
                     {
-                        var secondRow = _sudokuMapper.GetCellRow(secondCellIndex, blockMap);
-                        var secondCol = _sudokuMapper.GetCellCol(secondCellIndex, blockMap);
-                        
-                        var thirdRow = _sudokuMapper.GetCellRow(thirdCellIndex, blockMap);
-                        var thirdCol = _sudokuMapper.GetCellCol(thirdCellIndex, blockMap);
-                        
-                        if (IsNakedTriple(sudokuBoard[givenRow, givenCol], 
-                            sudokuBoard[secondRow, secondCol],
-                            sudokuBoard[thirdRow, thirdCol]))
-                        {
-                            return (
-                                First: sudokuBoard[givenRow, givenCol],
-                                Second: sudokuBoard[secondRow, secondCol],
-                                Third: sudokuBoard[thirdRow, thirdCol],
-                                IsNakedTriple: true
-                                );
-                        }
+                        return (
+                            First: sudokuBoard[firstRow, firstCol],
+                            Second: sudokuBoard[secondRow, secondCol],
+                            Third: sudokuBoard[thirdRow, thirdCol],
+                            IsNakedTriple: true
+                            );
                     }
                 }
+                
             }
 
             return (-1, -1,-1,false);
         }
 
         /// <summary>
-        /// If a cell in the same column as the naked Triple has more than three digit notes, removes the all of the naked Triple's digits from the notes.
+        /// If there is a naked triple in the block, removes the all of the naked triple' digits from the notes of the other cells.
         /// </summary>
         /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
-        /// <param name="givenRow">Row of the pivot cell.</param>
-        /// <param name="givenCol">Column of the pivot cell.</param>
-        internal void EliminateNakedTripleFromOthersInCol(int[,] sudokuBoard, int givenRow, int givenCol)
+        /// <param name="givenCol">The given column.</param>
+        internal void SolveNakedTripleOnCol(int[,] sudokuBoard, int givenCol)
         {
-            var nakedTriple = HasNakedTripleInCol(sudokuBoard, givenRow, givenCol);
+            var nakedTriple = HasNakedTripleOnCol(sudokuBoard, givenCol);
             if (!nakedTriple.IsNakedTriple) return;
-            for (int row = 0; row < sudokuBoard.GetLength(0); row++)
+            for (int row = 0; row < Constants.MaxGroupLength; row++)
             {
                 var cell = sudokuBoard[row, givenCol];
                 if (cell != nakedTriple.First && cell != nakedTriple.Second && cell != nakedTriple.Third)
@@ -127,44 +112,42 @@ namespace SudokuSolver.Strategies
 
 
         /// <summary>
-        /// Checks if there exist another two cells in the same column for the given cell with the given row and column info, so that they make a naked Triple together.
+        /// Checks if there is a naked triple in the given column.
         /// </summary>
         /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
-        /// <param name="givenRow">Row of the pivot cell.</param>
-        /// <param name="givenCol">Column of the pivot cell.</param>
+        /// <param name="givenCol">The given column.</param>
         /// <returns>A tuple with the the three naked numbers, and a bool value: IsNakedTriple, true if a proper naked Triple, false otherwise.</returns>
-        internal (int First, int Second, int Third, bool IsNakedTriple) HasNakedTripleInCol(int[,] sudokuBoard, int givenRow, int givenCol)
+        internal (int First, int Second, int Third, bool IsNakedTriple) HasNakedTripleOnCol(int[,] sudokuBoard, int givenCol)
         {
-            for (int row = 0; row < sudokuBoard.GetLength(0); row++)
+            for (int row1 = 0; row1 < Constants.MaxGroupLength; row1++)
+            for (int row2 = 0; row2 < Constants.MaxGroupLength; row2++)
+            for (int row3 = 0; row3 < Constants.MaxGroupLength; row3++)
             {
-                for (int row2 = 0; row2 < sudokuBoard.GetLength(0); row2++)
+                if ((row1 != row2 && row1 != row3 && row2!= row3) &&
+                    IsNakedTriple(sudokuBoard[row1, givenCol], sudokuBoard[row2, givenCol], sudokuBoard[row3, givenCol])) 
                 {
-                    if ((givenRow != row && givenRow != row2 && row!= row2) &&
-                        IsNakedTriple(sudokuBoard[givenRow, givenCol], sudokuBoard[row, givenCol], sudokuBoard[row2, givenCol])) 
-                    {
-                        return (
-                            First: sudokuBoard[givenRow, givenCol],
-                            Second: sudokuBoard[row, givenCol],
-                            Third: sudokuBoard[row2, givenCol],
-                            IsNakedTriple: true
-                        );
-                    }
+                    return (
+                        First: sudokuBoard[row1, givenCol],
+                        Second: sudokuBoard[row2, givenCol],
+                        Third: sudokuBoard[row3, givenCol],
+                        IsNakedTriple: true
+                    );
                 }
+                
             }
             return (-1, -1, -1, false);
         }
 
         /// <summary>
-        /// If a cell in the same row as the naked Triple has more than three digit notes, removes the all of the naked Triple's digits from the notes.
+        /// If there is a naked triple in the row, removes the naked triple digits from other non naked triple cells.
         /// </summary>
-        /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
-        /// <param name="givenRow">Row of the pivot cell.</param>
-        /// <param name="givenCol">Column of the pivot cell.</param>
-        internal void ELiminateNakedTripleFromOthersInRow(int[,] sudokuBoard, int givenRow, int givenCol)
+        /// <param name="sudokuBoard">The current represantation of the sudoku board.</param>
+        /// <param name="givenRow">The given row.</param>
+        internal void SolveNakedTripleOnRow(int[,] sudokuBoard, int givenRow)
         {
-            var nakedTriple = HasNakedTripleInRow(sudokuBoard, givenRow, givenCol);
+            var nakedTriple = HasNakedTripleOnRow(sudokuBoard, givenRow);
             if (!nakedTriple.IsNakedTriple) return;
-            for (int col = 0; col < sudokuBoard.GetLength(1); col++)
+            for (int col = 0; col < Constants.MaxGroupLength; col++)
             {
                 var cell = sudokuBoard[givenRow, col];
                 if (nakedTriple.First != cell && nakedTriple.Second != cell && nakedTriple.Third != cell)
@@ -176,29 +159,29 @@ namespace SudokuSolver.Strategies
         }
 
         /// <summary>
-        /// Checks if there exist another two cells in the same row for the given cell with the given row and column info, so that they make a naked Triple together.
+        /// Checks if there is a naked triple in the given row.
         /// </summary>
         /// <param name="sudokuBoard">The represantation of the sudoku board.</param>
-        /// <param name="givenRow">Row of the pivot cell.</param>
-        /// <param name="givenCol">Column of the pivot cell.</param>
-        /// <returns>A tuple with the the three naked numbers, and a bool value: IsNakedTriple, true if a proper naked Triple, false otherwise.</returns>
-        internal (int First, int Second, int Third, bool IsNakedTriple) HasNakedTripleInRow(int[,] sudokuBoard, int givenRow, int givenCol)
+        /// <param name="givenRow">The given row.</param>
+        /// <returns>A tuple with the the four naked numbers, and a bool value: IsNakedQuad, true if a proper naked triple, false otherwise.</returns>
+        internal (int First, int Second, int Third, bool IsNakedTriple) HasNakedTripleOnRow(int[,] sudokuBoard, int givenRow)
         {
-            for (int col = 0; col < sudokuBoard.GetLength(1); col++)
+
+            for (int col1 = 0; col1 < Constants.MaxGroupLength; col1++)
+            for (int col2 = 0; col2 < Constants.MaxGroupLength; col2++)
+            for (int col3 = 0; col3 < Constants.MaxGroupLength; col3++)
             {
-                for (int col2 = 0; col2 < sudokuBoard.GetLength(1); col2++)
+                if (!AreSameCells(col1, col2, col3) &&
+                    IsNakedTriple(sudokuBoard[givenRow, col2], sudokuBoard[givenRow, col3], sudokuBoard[givenRow, col1]))
                 {
-                    if ((givenCol != col && givenCol != col2 && col != col2) &&
-                        IsNakedTriple(sudokuBoard[givenRow, col], sudokuBoard[givenRow, col2], sudokuBoard[givenRow, givenCol]))
-                    {
-                        return (
-                            First: sudokuBoard[givenRow, givenCol], 
-                            Second: sudokuBoard[givenRow, col], 
-                            Third: sudokuBoard[givenRow, col2], 
-                            IsNakedTriple: true
-                        );
-                    }
+                    return (
+                        First: sudokuBoard[givenRow, col1], 
+                        Second: sudokuBoard[givenRow, col2], 
+                        Third: sudokuBoard[givenRow, col3], 
+                        IsNakedTriple: true
+                    );
                 }
+                
             }
             return (-1, -1, -1, false);
         }
@@ -217,13 +200,13 @@ namespace SudokuSolver.Strategies
             {
                 var cell = sudokuBoard[eliminateFromRow, eliminateFromCol];
                 var strCell = cell.ToString();
-                strCell.Replace(valueToEliminate.ToString(), string.Empty);
-                sudokuBoard[eliminateFromRow, eliminateFromCol] = Convert.ToInt32(sudokuBoard[eliminateFromRow, eliminateFromCol].ToString().Replace(valueToEliminate.ToString(), string.Empty));
+                strCell = strCell.Replace(valueToEliminate.ToString(), string.Empty);
+                sudokuBoard[eliminateFromRow, eliminateFromCol] = Convert.ToInt32(strCell);
             }
         }
 
         /// <summary>
-        /// Given three numbers checks if they are a possible naked triple.
+        /// Checks the given three numbers, if they are a naked triple.
         /// A naked triple occurs when you have exactly three cells within a row, column, or 3×3 region 
         /// where the only candidates are the same three digits or a subset of these three digits. 
         /// </summary>
@@ -257,16 +240,16 @@ namespace SudokuSolver.Strategies
         }
 
         /// <summary>
-        /// Checks two cells with the given row and column if they are the same cell.
+        /// Checks if any of the three cells with the given indexes are same.
+        /// Index: row, column or block index.
         /// </summary>
-        /// <param name="row1">Row of the first cell.</param>
-        /// <param name="col1">Column of the first cel.l</param>
-        /// <param name="row2">Row of the second cell.</param>
-        /// <param name="col2">Column of the second cell.</param>
-        /// <returns>Returns true if the two cells are the same and false otherwise.</returns>
+        /// <param name="index1"></param>
+        /// <param name="index2"></param>
+        /// <param name="index3"></param>
+        /// <returns>True if all cells are different, and false otherwise.</returns>
         private bool AreSameCells(int index1, int index2, int index3)
         {
-            return (index1 == index2 || index1 == index3 || index2 == index3);
+            return new HashSet<int> { index1, index2, index3 }.Count != 3;
         }
     }
 }

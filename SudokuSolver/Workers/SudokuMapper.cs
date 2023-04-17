@@ -9,8 +9,68 @@ namespace SudokuSolver.Workers
 {
     internal class SudokuMapper
     {
+        private readonly List<SudokuMap> mapList = new List<SudokuMap>
+        {
+            new SudokuMap
+            {
+                StartRow = 0,
+                StartCol = 0
+            },
+            new SudokuMap
+            {
+                StartRow = 0,
+                StartCol = 3
+            },
+            new SudokuMap
+            {
+                StartRow = 0,
+                StartCol = 6
+            },
+            new SudokuMap
+            {
+                StartRow = 3,
+                StartCol = 0
+            },
+            new SudokuMap
+            {
+                StartRow = 3,
+                StartCol = 3
+            },
+            new SudokuMap
+            {
+                StartRow = 3,
+                StartCol = 6
+            },
+            new SudokuMap
+            {
+                StartRow = 6,
+                StartCol = 0
+            },
+            new SudokuMap
+            {
+                StartRow = 6,
+                StartCol = 3
+            },
+            new SudokuMap
+            {
+                StartRow = 6,
+                StartCol = 6
+            },
+        };
+
         /// <summary>
-        /// From a given row a given column info finds which block contains the row and the column.
+        /// From a given block index info finds the block map.
+        /// </summary>
+        /// <param name="givenBlockIndex">The given block index.</param>
+        /// <returns>
+        /// A Sudoku Map object which contains the start row and the column for the block.
+        /// </returns>
+        public SudokuMap Find(int givenBlockIndex)
+        {   
+            return mapList[givenBlockIndex];
+        }
+        /// <summary>
+        /// From a given row a given column info finds the block map.
         /// </summary>
         /// <param name="givenRow">The given row</param>
         /// <param name="givenCol">The given column</param>
