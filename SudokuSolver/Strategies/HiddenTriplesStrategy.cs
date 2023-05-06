@@ -12,7 +12,7 @@ namespace SudokuSolver.Strategies
 {
     internal class HiddenTriplesStrategy : ISudokuStrategy
     {
-        private enum Group
+        public enum Group
         {
             Row,
             Col,
@@ -22,29 +22,30 @@ namespace SudokuSolver.Strategies
         {
             for (int index = 0; index < Constants.MaxGroupLength;  index++)
             {
-                //SolveHiddenTripleOnRow(sudokuBoard, index);
-                int[] temp = GetGroupArray(sudokuBoard, index, Group.Block);
+                SolveHiddenTripleOnGroup(sudokuBoard, GetGroupArray(sudokuBoard, Group.Row, index), Group.Row, index);
+                SolveHiddenTripleOnGroup(sudokuBoard, GetGroupArray(sudokuBoard, Group.Col, index), Group.Col, index);
+                SolveHiddenTripleOnGroup(sudokuBoard, GetGroupArray(sudokuBoard, Group.Block, index), Group.Block, index);
             }
             return sudokuBoard;
         }
 
-        private int[] GetGroupArray(int[,] sudokuBoard, int index, Group group)
+        private int[] GetGroupArray(int[,] sudokuBoard, Group groupType, int index)
         {
             int[] rowArray = new int[Constants.MaxGroupLength];
 
-            if (group == Group.Row)
+            if (groupType == Group.Row)
             {
                 rowArray = Enumerable.Range(0, Constants.MaxGroupLength)
                     .Select(col => sudokuBoard[index, col])
                     .ToArray();
             }
-            else if (group == Group.Col)
+            else if (groupType == Group.Col)
             {
                 rowArray = Enumerable.Range(0, Constants.MaxGroupLength)
                     .Select(row => sudokuBoard[row, index])
                     .ToArray();
             }
-            else if (group == Group.Block)
+            else if (groupType == Group.Block)
             {
                 SudokuMapper mapper = new SudokuMapper();
                 SudokuMap map = mapper.Find(index);
@@ -56,32 +57,72 @@ namespace SudokuSolver.Strategies
             
             return rowArray;
         }
-
-        public void SolveHiddenTripleOnRow(int[,] sudokuBoard, int row)
+        //      ! 569 !    { 3, 7, 256, 4, 256, 8, 1, 2569, 29 }, 
+        public void SolveHiddenTripleOnGroup(int[,]sudokuBoard, int[] group, Group groupType, int groupIndex)
         {
-            var dict = GetDigitOccurrencesDictionaryInRow(sudokuBoard, row);
-            for (int col1 = 0; col1 < Constants.MaxGroupLength; col1++)
+            var dict = GetDigitOccurrencesDictionaryInGroup(group);
+
+            for (int index1 = 0; index1 < Constants.MaxGroupLength; index1++)
             {
-                for (int col2 = 0; col2 < Constants.MaxGroupLength; col2++)
+                for (int index2 = 0; index2 < Constants.MaxGroupLength; index2++)
                 {
-                    for (int col3 = 0; col3 < Constants.MaxGroupLength; col3++)
+                    for (int index3 = 0; index3 < Constants.MaxGroupLength; index3++)
                     {
-                        if (AreSameCells(col1, col2, col3)) continue;
+                        if (AreSameCells(index1, index2, index3)) continue;
+
                         var hiddenTripleDict = dict.Select(t => t)
                             .Where(t => t.Value.Count() >= 2 && t.Value.Count() <= 3)
-                            .Where(t => t.Value.Contains(col1) || t.Value.Contains(col2) || t.Value.Contains(col3))
+                            .Where(t => t.Value.Contains(index1) || t.Value.Contains(index2) || t.Value.Contains(index3))
                             .ToDictionary(t => t.Key, t => t.Value);
                         if (hiddenTripleDict.Count >= 3)
                         {
-                            var firstCell = sudokuBoard[row, col1];
-                            var secondCell = sudokuBoard[row, col2];
-                            var thirdCell = sudokuBoard[row, col3];
+                            var firstCell = group[index1];
+                            var secondCell = group[index2];
+                            var thirdCell = group[index3];
 
                             var hiddenTripleCandidates = string.Join("", hiddenTripleDict.Keys);
-                            if (IsHiddenTriple(firstCell, secondCell, thirdCell, hiddenTripleCandidates)) {
-                                CleanCellForHiddenTriple(sudokuBoard, row, col1, hiddenTripleCandidates);
-                                CleanCellForHiddenTriple(sudokuBoard, row, col2, hiddenTripleCandidates);
-                                CleanCellForHiddenTriple(sudokuBoard, row, col3, hiddenTripleCandidates);
+                            if (IsHiddenTriple(firstCell, secondCell, thirdCell, hiddenTripleCandidates, group)) {
+                                
+                                var cellRow1 = groupIndex;
+                                var cellCol1 = groupIndex;
+
+                                var cellRow2 = groupIndex;
+                                var cellCol2 = groupIndex;
+
+                                var cellRow3 = groupIndex;
+                                var cellCol3 = groupIndex;
+
+                                if (groupType == Group.Row)
+                                {
+                                    cellCol1 = index1;
+                                    cellCol2 = index2;
+                                    cellCol3 = index3;
+                                }
+
+                                if (groupType == Group.Col)
+                                {
+                                    cellRow1 = index1;
+                                    cellRow2 = index2;
+                                    cellRow3 = index3;
+                                }
+
+                                if (groupType == Group.Block)
+                                {
+                                    SudokuMapper mapper = new SudokuMapper();
+                                    SudokuMap map = mapper.Find(groupIndex);
+
+                                    cellRow1 = mapper.GetCellRow(index1, map);
+                                    cellCol1 = mapper.GetCellCol(index1, map);
+
+                                    cellRow2 = mapper.GetCellRow(index2, map);
+                                    cellCol2 = mapper.GetCellCol(index2, map);
+
+                                    cellRow3 = mapper.GetCellRow(index3, map);
+                                    cellCol3 = mapper.GetCellCol(index3, map);
+                                }
+                                CleanCellForHiddenTriple(sudokuBoard, cellRow1, cellCol1, hiddenTripleCandidates);
+                                CleanCellForHiddenTriple(sudokuBoard, cellRow2, cellCol2, hiddenTripleCandidates);
+                                CleanCellForHiddenTriple(sudokuBoard, cellRow3, cellCol3, hiddenTripleCandidates);
                             }
                         }
                     }
@@ -90,7 +131,7 @@ namespace SudokuSolver.Strategies
 
         }
 
-        private Dictionary<char, List<int>> GetDigitOccurrencesDictionaryInRow(int[,] sudokuBoard, int givenRow)
+        private Dictionary<char, List<int>> GetDigitOccurrencesDictionaryInGroup(int[] group)
         {
             Dictionary<char, List<int>> digitOccurrencesDictionary = new Dictionary<char, List<int>>();
             for (int i = 1; i <=9; i++)
@@ -98,23 +139,24 @@ namespace SudokuSolver.Strategies
                 digitOccurrencesDictionary[i.ToString()[0]] = new List<int>();
             }
 
-            for (int col = 0; col < Constants.MaxGroupLength; col++)
+            for (int index = 0; index < Constants.MaxGroupLength; index++)
             {
-                var cell = sudokuBoard[givenRow, col];
+                var cell = group[index];
                 if (cell.ToString().Length == 1) continue;
                 var possibilities = cell.ToString().ToCharArray();
 
                 foreach (var possibility in possibilities)
                 {
-                    digitOccurrencesDictionary[possibility].Add(col);
+                    digitOccurrencesDictionary[possibility].Add(index);
                 }
             }
             return digitOccurrencesDictionary;
         }
 
         /// <summary>
-        /// Checks the given three numbers, if they contain a hidden triple.
+        /// Checks the given three numbers, if they contain a hidden triplefor the given group.
         /// A hidden  triple occurs when there is a naked triple  but hidden behind other non-naked triple candidates.
+        /// The digits of a hidden triple must not exist in any other cell than the three cells.
         /// </summary>
         /// 
         /// <example>
@@ -126,8 +168,23 @@ namespace SudokuSolver.Strategies
         /// <param name="thirdHidden">Third hidden Triple candidate.</param>
         /// 
         /// <returns>Returns true if the three numbers are a naked Triple, false otherwise.</returns>
-        internal bool IsHiddenTriple(int firstHidden, int secondHidden, int thirdHidden, string hiddenTripleCandidates)
+        internal bool IsHiddenTriple(int firstHidden, int secondHidden, int thirdHidden, string hiddenTripleCandidates, int[] group)
         {
+
+            // Checks if anyother cell 
+            foreach (var cell in group)
+            {
+                if (cell != firstHidden && cell != secondHidden && cell != thirdHidden)
+                {
+                    var cellStr = cell.ToString();
+                    foreach (var digit in cellStr)
+                    {
+                        if (hiddenTripleCandidates.Contains(digit)) return false;
+                    }
+                }
+
+            }
+
             string strFirstNaked = StripCell(firstHidden.ToString(), hiddenTripleCandidates);
             string strSecondNaked = StripCell(secondHidden.ToString(), hiddenTripleCandidates);
             string strThirdNaked = StripCell(thirdHidden.ToString(), hiddenTripleCandidates);
